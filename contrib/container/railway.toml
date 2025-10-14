@@ -5,4 +5,5 @@ dockerfilePath = "/contrib/container/Dockerfile"
 [deploy]
 startCommand = "sh", "-c", "exec gunicorn -c ./gunicorn.conf.py InvenTree.wsgi -b 0.0.0.0:8000 --chdir ${INVENTREE_BACKEND_DIR}/InvenTree"
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
+restartPolicyMaxRet
+ries = 10
