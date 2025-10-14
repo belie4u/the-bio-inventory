@@ -1,5 +1,5 @@
 # Production stage
-FROM python:3.11-slim-bullseye AS production
+FROM python:3.11-slim-bookworm AS production
 
 # Build arguments
 ARG commit_tag=""
