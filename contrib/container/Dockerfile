@@ -51,11 +51,12 @@ LABEL org.opencontainers.image.vendor="inventree" \
 # Install minimal runtime system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     weasyprint libpango-1.0-0 libcairo2 poppler-utils \
-    postgresql-client mariadb-client \
+    postgresql-client \
     fontconfig fonts-freefont-ttf fonts-terminus fonts-noto-core fonts-noto-cjk \
-    libldap2-dev libsasl2-dev libssl-dev libmariadb-dev pkg-config \
+    libssl-dev pkg-config \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Create working directory
 RUN mkdir -p ${INVENTREE_HOME}
