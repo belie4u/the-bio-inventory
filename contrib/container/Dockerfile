@@ -88,11 +88,6 @@ RUN pip install --no-cache-dir --require-hashes -r base_requirements.txt && \
     pip install --no-cache-dir --require-hashes -r ${INVENTREE_BACKEND_DIR}/requirements.txt && \
     pip cache purge
 
-# Install frontend dependencies and compile
-RUN npm install -g n yarn --ignore-scripts && \
-    yarn config set network-timeout 600000 -g && \
-    n lts
-RUN cd "${INVENTREE_HOME}" && invoke int.frontend-compile --extract
 
 # Expose port
 EXPOSE 8000
