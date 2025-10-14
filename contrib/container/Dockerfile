@@ -1,5 +1,5 @@
 # Production stage
-FROM python:3.11-slim-bullseye@sha256:3b0c8b6f8a7d3a3b7f6e3b9e3e1b1b8e8b9e0e1b1b8e8b9e0e1b1b8e8b9e0e1 AS production
+FROM python:3.11-slim-bullseye AS production
 
 # Build arguments
 ARG commit_tag=""
