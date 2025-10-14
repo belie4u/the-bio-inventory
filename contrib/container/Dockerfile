@@ -1,5 +1,5 @@
 # Production stage
-FROM python:3.11-slim-bookworm AS production
+FROM python:3.11-slim-trixie@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 AS inventree_base
 
 # Build arguments
 ARG commit_tag=""
@@ -51,10 +51,9 @@ LABEL org.opencontainers.image.vendor="inventree" \
 # Install minimal runtime system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     weasyprint libpango-1.0-0 libcairo2 poppler-utils \
-    postgresql-client \
+    postgresql-client mariadb-client \
     fontconfig fonts-freefont-ttf fonts-terminus fonts-noto-core fonts-noto-cjk \
-    libldap2-dev libsasl2-dev libssl-dev libpq-dev \
-    gcc python3-dev \
+    libldap2-dev libsasl2-dev libssl-dev libmariadb-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
