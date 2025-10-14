@@ -1,5 +1,5 @@
 # Production stage
-FROM python:3.11-slim-trixie@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 AS inventree_base
+FROM python:3.11-slim-trixie@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 AS production
 
 # Build arguments
 ARG commit_tag=""
@@ -50,18 +50,13 @@ LABEL org.opencontainers.image.vendor="inventree" \
 
 # Install minimal runtime system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config build-essential \
-    libldap2-dev libsasl2-dev libssl-dev \
-    libmariadb-dev \
+    weasyprint libpango-1.0-0 libcairo2 poppler-utils \
+    postgresql-client \
+    fontconfig fonts-freefont-ttf fonts-terminus fonts-noto-core fonts-noto-cjk \
+    libldap2-dev libsasl2-dev libssl-dev libpq-dev \
+    gcc python3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Build and install python dependencies
-RUN pip install --user --require-hashes -r base_requirements.txt --no-cache-dir && \
-    pip install --user --require-hashes -r requirements.txt --no-cache-dir && \
-    pip cache purge && \
-    rm -rf /root/.cache/pip
-
 
 # Create working directory
 RUN mkdir -p ${INVENTREE_HOME}
