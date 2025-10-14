@@ -54,6 +54,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client mariadb-client \
     fontconfig fonts-freefont-ttf fonts-terminus fonts-noto-core fonts-noto-cjk \
     libldap2-dev libsasl2-dev libssl-dev libmariadb-dev \
+    gcc python3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
