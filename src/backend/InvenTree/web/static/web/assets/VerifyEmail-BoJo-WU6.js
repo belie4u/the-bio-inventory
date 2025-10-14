@@ -1,0 +1,2 @@
+import{r,n as e,i,j as s,H as o,A as n}from"./vendor-COjCG5sX.js";import{a2 as m}from"./index-ClP83spC.js";import{Wrapper as f}from"./Layout-Ka7T8P9L.js";import{q as l,a as c}from"./ThemeContext-B85sS1BU.js";function j(){const{key:a}=l(),t=c();return r.useEffect(()=>{a||(e.show({title:i._({id:"Z6LIBa"}),message:i._({id:"aUBlDM"}),color:"red"}),t("/login"))},[a]),s.jsx(f,{titleText:i._({id:"wCKkSr"}),children:s.jsx(o,{type:"submit",onClick:()=>m(a,t),children:s.jsx(n,{id:"uSMfoN"})})})}export{j as default};
+//# sourceMappingURL=VerifyEmail-BoJo-WU6.js.map

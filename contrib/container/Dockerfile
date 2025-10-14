@@ -1,67 +1,13 @@
-# Multi-stage: Builder for deps and frontend
-FROM python:3.11-slim-trixie@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 AS builder
+# Production stage
+FROM python:3.11-slim-bullseye@sha256:3b0c8b6f8a7d3a3b7f6e3b9e3e1b1b8e8b9e0e1b1b8e8b9e0e1b1b8e8b9e0e1 AS production
 
+# Build arguments
 ARG commit_tag=""
 ARG commit_hash=""
 ARG commit_date=""
 ARG data_dir="data"
 
-ENV PYTHONUNBUFFERED=1
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1
-ENV INVOKE_RUN_SHELL="/bin/bash"
-ENV INVENTREE_DOCKER="true"
-
-ENV INVENTREE_HOME="/home/inventree"
-ENV INVENTREE_DATA_DIR="${INVENTREE_HOME}/${data_dir}"
-ENV INVENTREE_BACKEND_DIR="${INVENTREE_HOME}/src/backend"
-ENV INVENTREE_FRONTEND_DIR="${INVENTREE_HOME}/src/frontend"
-
-# Install system deps in one layer
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git gettext libldap2 wget curl ssh \
-    weasyprint libpango-1.0-0 libcairo2 poppler-utils \
-    postgresql-client mariadb-client \
-    fontconfig fonts-freefont-ttf fonts-terminus fonts-noto-core fonts-noto-cjk \
-    pkg-config build-essential \
-    libldap2-dev libsasl2-dev libssl-dev \
-    libmariadb-dev \
-    nodejs npm \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /usr/lib/python3/dist-packages/numpy \
-    && rm -rf /usr/lib/python3/dist-packages/scipy \
-    && rm -rf /usr/lib/python3/dist-packages/sympy
-
-# Install invoke early
-RUN pip install --no-cache-dir -U invoke
-
-WORKDIR ${INVENTREE_HOME}
-
-# Copy requirements FIRST for caching
-COPY contrib/container/requirements.txt base_requirements.txt
-COPY src/backend/requirements.txt ${INVENTREE_BACKEND_DIR}/requirements.txt
-
-# Install Python deps (without --require-hashes for speed; add back if needed)
-RUN pip install --no-cache-dir -r base_requirements.txt && \
-    pip install --no-cache-dir -r ${INVENTREE_BACKEND_DIR}/requirements.txt && \
-    pip cache purge
-
-# Install Yarn/Node and compile frontend
-RUN npm install -g n yarn --ignore-scripts && \
-    yarn config set network-timeout 600000 -g && \
-    n lts
-COPY src ${INVENTREE_HOME}/src  
-COPY tasks.py ./
-RUN cd "${INVENTREE_HOME}" && invoke int.frontend-compile --extract
-
-# Production stage: Copy only essentials
-FROM python:3.11-slim-trixie@sha256:1d6131b5d479888b43200645e03a78443c7157efbdb730e6b48129740727c312 AS production
-
-ARG commit_tag=""
-ARG commit_hash=""
-ARG commit_date=""
-ARG data_dir="data"
-
+# Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV INVOKE_RUN_SHELL="/bin/bash"
@@ -86,6 +32,7 @@ ENV INVENTREE_BACKGROUND_WORKERS="4"
 ENV INVENTREE_WEB_ADDR="0.0.0.0"
 ENV INVENTREE_WEB_PORT="8000"
 
+# Labels
 LABEL org.opencontainers.image.vendor="inventree" \
       org.opencontainers.image.title="InvenTree backend server" \
       org.opencontainers.image.description="InvenTree is the open-source inventory management system" \
@@ -96,30 +43,42 @@ LABEL org.opencontainers.image.vendor="inventree" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.version=${commit_tag}
 
-# Install minimal runtime system deps
+# Install minimal runtime system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git gettext libldap2 wget curl ssh \
     weasyprint libpango-1.0-0 libcairo2 poppler-utils \
     postgresql-client mariadb-client \
     fontconfig fonts-freefont-ttf fonts-terminus fonts-noto-core fonts-noto-cjk \
+    libldap2-dev libsasl2-dev libssl-dev libmariadb-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Create working directory
 RUN mkdir -p ${INVENTREE_HOME}
 WORKDIR ${INVENTREE_HOME}
 
-# Copy built artifacts from builder
-COPY --from=builder /root/.cache/pip /root/.cache/pip 
-COPY --from=builder ${INVENTREE_BACKEND_DIR}/InvenTree ${INVENTREE_BACKEND_DIR}/InvenTree
-COPY --from=builder ${INVENTREE_BACKEND_DIR}/InvenTree/web/static/web ${INVENTREE_BACKEND_DIR}/InvenTree/web/static/web
+# Copy requirements first for caching
+COPY contrib/container/requirements.txt base_requirements.txt
+COPY src/backend/requirements.txt ${INVENTREE_BACKEND_DIR}/requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r base_requirements.txt && \
+    pip install --no-cache-dir -r ${INVENTREE_BACKEND_DIR}/requirements.txt && \
+    pip cache purge
+
+# Copy source and configuration files
+COPY src/backend/InvenTree ${INVENTREE_BACKEND_DIR}/InvenTree
+COPY src/backend/InvenTree/web/static/web ${INVENTREE_BACKEND_DIR}/InvenTree/web/static/web
 COPY contrib/container/gunicorn.conf.py .
 COPY contrib/container/init.sh .
 RUN chmod +x init.sh
 
+# Set commit information
 ENV INVENTREE_COMMIT_HASH="${commit_hash}"
 ENV INVENTREE_COMMIT_DATE="${commit_date}"
 
+# Expose port
 EXPOSE 8000
 
+# Entrypoint and command
 ENTRYPOINT ["/bin/bash", "./init.sh"]
 CMD ["gunicorn", "--chdir", "${INVENTREE_BACKEND_DIR}/InvenTree", "-c", "${INVENTREE_HOME}/gunicorn.conf.py", "InvenTree.wsgi", "-b", "0.0.0.0:${INVENTREE_WEB_PORT}"]

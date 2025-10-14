@@ -108,6 +108,8 @@ messages.ts
 # Generated API schema file
 api.yaml
 
-# web frontend (static files)
-src/backend/InvenTree/web/static
-InvenTree/web/static
+# web frontend (static files), except compiled assets
+src/backend/InvenTree/web/static/*
+!src/backend/InvenTree/web/static/web
+InvenTree/web/static/*
+!InvenTree/web/static/web
