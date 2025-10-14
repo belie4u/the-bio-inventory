@@ -22,6 +22,7 @@ ENV INVENTREE_MEDIA_ROOT="${INVENTREE_DATA_DIR}/media"
 ENV INVENTREE_BACKUP_DIR="${INVENTREE_DATA_DIR}/backup"
 ENV INVENTREE_PLUGIN_DIR="${INVENTREE_DATA_DIR}/plugins"
 ENV INVENTREE_BACKEND_DIR="${INVENTREE_HOME}/src/backend"
+ENV INVENTREE_FRONTEND_DIR="${INVENTREE_HOME}/src/frontend"
 
 # InvenTree configuration files
 ENV INVENTREE_CONFIG_FILE="${INVENTREE_DATA_DIR}/config.yaml"
@@ -75,6 +76,7 @@ WORKDIR ${INVENTREE_HOME}
 
 # Copy source and configuration files
 COPY src/backend/InvenTree ${INVENTREE_BACKEND_DIR}/InvenTree
+COPY src/frontend ${INVENTREE_FRONTEND_DIR}
 COPY src/backend/requirements.txt ${INVENTREE_BACKEND_DIR}/requirements.txt
 COPY contrib/container/requirements.txt base_requirements.txt
 COPY tasks.py \
@@ -104,5 +106,5 @@ ENV INVENTREE_COMMIT_DATE="${commit_date}"
 # Entrypoint
 ENTRYPOINT ["/bin/bash", "./init.sh"]
 
-# Launch production server (aligned with your contrib/container configuration)
+# Launch production server
 CMD ["gunicorn", "--chdir", "${INVENTREE_BACKEND_DIR}/InvenTree", "-c", "${INVENTREE_HOME}/gunicorn.conf.py", "InvenTree.wsgi", "-b", "0.0.0.0:${INVENTREE_WEB_PORT}"]
