@@ -7,22 +7,20 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install essential build dependencies
+# 🧩 Add pkg-config here (critical fix)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
+    build-essential gcc pkg-config \
     libldap2-dev libsasl2-dev libssl-dev \
-    libmariadb-dev libpq-dev \
-    libffi-dev zlib1g-dev \
+    libmariadb-dev libpq-dev libffi-dev zlib1g-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /install
 
-# Copy requirements files
+# Copy requirements first (for caching)
 COPY contrib/container/requirements.txt base_requirements.txt
 COPY src/backend/requirements.txt backend_requirements.txt
 
-# Upgrade pip + install dependencies
+# Install Python deps (optimized for prebuilt wheels)
 RUN pip install --upgrade pip setuptools wheel \
  && pip install --prefer-binary -r base_requirements.txt \
  && pip install --prefer-binary -r backend_requirements.txt
@@ -45,7 +43,7 @@ ENV PYTHONUNBUFFERED=1 \
     INVENTREE_BACKUP_DIR="/inventree/data/backup" \
     INVENTREE_PLUGIN_DIR="/inventree/data/plugins"
 
-# Install only runtime dependencies
+# Install only what’s needed at runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git gettext wget curl \
     postgresql-client mariadb-client \
@@ -53,12 +51,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig fonts-noto-core \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy installed Python packages
+# Copy Python packages from builder
 COPY --from=builder /usr/local /usr/local
 
 WORKDIR ${INVENTREE_HOME}
 
-# Copy application source
+# Copy your backend code
 COPY src/backend/InvenTree ${INVENTREE_BACKEND_DIR}/InvenTree
 COPY tasks.py contrib/container/gunicorn.conf.py contrib/container/init.sh ./
 RUN chmod +x init.sh
