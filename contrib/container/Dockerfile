@@ -1,7 +1,7 @@
 # ===============================
 # STAGE 1 — Builder
 # ===============================
-FROM python:3.11-slim-trixie AS builder
+FROM python:3.14-slim-trixie AS builder
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -28,7 +28,7 @@ RUN pip install --upgrade pip setuptools wheel \
 # ===============================
 # STAGE 2 — Production
 # ===============================
-FROM python:3.11-slim-trixie AS production
+FROM python:3.14-slim-trixie AS production
 
 ENV PYTHONUNBUFFERED=1 \
     INVENTREE_DOCKER=true \
