@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "contrib/container/Dockerfile"
 
 [deploy]
-startCommand = "gunicorn --chdir /home/inventree/src/backend/InvenTree -c /home/inventree/src/backend/InvenTree/gunicorn.conf.py InvenTree.wsgi:application -b 0.0.0.0:$PORT"
+startCommand = "gunicorn --chdir /inventree/src/backend/InvenTree -c /inventree/src/backend/InvenTree/gunicorn.conf.py InvenTree.wsgi:application -b 0.0.0.0:$PORT"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 

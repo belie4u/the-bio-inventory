@@ -21,7 +21,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${INVENTREE_DB_USER}:${INVENTREE_DB_PASSWORD}@${INVENTREE_DB_HOST}:${INVENTREE_DB_PORT}/${INVENTREE_DB_NAME}?sslmode=require
     volumes:
-      - ${INVENTREE_EXT_VOLUME}:/home/inventree/data:z
+      - ${INVENTREE_EXT_VOLUME}:/inventree/data:z
     restart: unless-stopped
 
   inventree-worker:
@@ -36,7 +36,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${INVENTREE_DB_USER}:${INVENTREE_DB_PASSWORD}@${INVENTREE_DB_HOST}:${INVENTREE_DB_PORT}/${INVENTREE_DB_NAME}?sslmode=require
     volumes:
-      - ${INVENTREE_EXT_VOLUME}:/home/inventree/data:z
+      - ${INVENTREE_EXT_VOLUME}:/inventree/data:z
     restart: unless-stopped
 
   inventree-proxy:
