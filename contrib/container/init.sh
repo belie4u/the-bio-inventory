@@ -25,10 +25,11 @@ if [[ ! -d "$INVENTREE_BACKUP_DIR" ]]; then
 fi
 
 # Check if "config.yaml" has been copied into the correct location
+INVENTREE_CONFIG_FILE=${INVENTREE_CONFIG_FILE:-${INVENTREE_DATA_DIR}/config.yaml}
 if test -f "$INVENTREE_CONFIG_FILE"; then
     echo "Loading config file : $INVENTREE_CONFIG_FILE"
 else
-    echo "Copying config file from $INVENTREE_BACKEND_DIR/InvenTree/config_template.yml to $INVENTREE_CONFIG_FILE"
+    echo "Copying config file from $INVENTREE_BACKEND_DIR/InvenTree/config_template.yaml to $INVENTREE_CONFIG_FILE"
     cp $INVENTREE_BACKEND_DIR/InvenTree/config_template.yaml $INVENTREE_CONFIG_FILE
 fi
 
