@@ -1,9 +1,11 @@
 [build]
 builder = "DOCKERFILE"
-RAILWAY_DOCKERFILE_PATH = "/InvenTree/contrib/container/Dockerfile"  
+dockerfilePath = "contrib/container/Dockerfile"
 
 [deploy]
-startCommand = "sh", "-c", "exec gunicorn -c ./gunicorn.conf.py InvenTree.wsgi -b 0.0.0.0:8000 --chdir ${INVENTREE_BACKEND_DIR}/InvenTree"
+startCommand = "gunicorn --chdir /home/inventree/src/backend/InvenTree -c /home/inventree/src/backend/InvenTree/gunicorn.conf.py InvenTree.wsgi:application -b 0.0.0.0:$PORT"
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRet
-ries = 10
+restartPolicyMaxRetries = 10
+
+[variables]
+APP_HOME = "/inventree"
