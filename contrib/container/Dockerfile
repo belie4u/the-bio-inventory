@@ -59,7 +59,6 @@ WORKDIR ${INVENTREE_HOME}
 # Copy your backend code
 COPY src/backend/InvenTree ${INVENTREE_BACKEND_DIR}/InvenTree
 COPY tasks.py contrib/container/gunicorn.conf.py contrib/container/init.sh ./
-COPY /inventree/src/backend/InvenTree/config_template.yaml /inventree/src/backend/InvenTree/config.yaml
 RUN chmod +x init.sh
 
 EXPOSE ${INVENTREE_WEB_PORT}
